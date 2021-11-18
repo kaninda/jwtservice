@@ -9,7 +9,7 @@ create table T_USER (
                         user_id BIGINT auto_increment primary key not null,
                         user_name varchar(32) not null,
                         name varchar(32) not null,
-                        password varchar(32) not null
+                        password LONGTEXT not null
 )ENGINE = InnoDB;
 
 create table T_ROLE (

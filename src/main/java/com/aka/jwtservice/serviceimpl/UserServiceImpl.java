@@ -7,37 +7,43 @@ import com.aka.jwtservice.repository.UserRepository;
 import com.aka.jwtservice.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @Slf4j
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository,  RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public void createUser(User user) {
+    public User createUser(User user) {
         log.info("Create User => {}", user.getUserName());
-       userRepository.save (user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save (user);
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> findAllUsers() {
         log.info("Retrieving all users ");
-       return userRepository.findAll();
+        return userRepository.findAll();
     }
 
     @Override
-    public User getUserName(String userName) {
+    public User findByUserName(String userName) {
         log.info("Finding user by the his name => {}", userName);
         return userRepository.findByUserName(userName);
     }
@@ -63,6 +69,5 @@ public class UserServiceImpl implements UserService {
         log.info("Deleting User => {}", userName);
         final User user = userRepository.findByUserName(userName);
         userRepository.delete(user);
-
     }
 }
